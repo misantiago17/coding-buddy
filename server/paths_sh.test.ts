@@ -20,9 +20,11 @@ const PATHS_SH = resolve(import.meta.dir, "..", "scripts", "paths.sh");
  * already what `join()` produces. On Windows, Git Bash says
  * `/c/Users/dev/.claude` where Node says `C:\Users\dev\.claude` — the same
  * directory, so compare them in the shell's notation rather than asserting
- * that Windows is Linux. Identity on POSIX.
+ * that Windows is Linux. Identity on POSIX, where a backslash is a legal
+ * character in a filename and must survive untouched.
  */
-function posixPath(path: string): string {
+function posixPath(path: string, platform: string = process.platform): string {
+  if (platform !== "win32") return path;
   const slashed = path.replace(/\\/g, "/");
   const drive = slashed.match(/^([A-Za-z]):\//);
   return drive ? `/${drive[1].toLowerCase()}/${slashed.slice(3)}` : slashed;
